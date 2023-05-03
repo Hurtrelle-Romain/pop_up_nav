@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:pop_up_and_nav/next.dart';
 
 void main() {
   runApp(const MyApp());
@@ -46,35 +47,19 @@ Color appBarColor = Colors.lightBlueAccent;
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
              ElevatedButton(
-                onPressed: () {
-                    AlertDialog alert = AlertDialog(
-                    title: const Text("Ma première alerte"),
-                    content: const Text("J'ai crée ma première alerte"),
-                    actions: [
-                      TextButton(
-                          onPressed: () {
-                            Navigator.of(context).pop();
-                          },
-                          child: const Text("Ok")),
-                      TextButton(onPressed: () {
-                        Navigator.of(context).pop();
-                        setState(() {
-                          appBarColor = (appBarColor == Colors.lightBlueAccent)
-                              ? Colors.lightGreenAccent
-                              : Colors.lightBlueAccent;
-                        });
-                      },
-                          child: Text("Changer le AppBar")),
-                    ],
-                  );
-                  showDialog(
-                      barrierDismissible: true,
-                      context: context,
-                      builder: (BuildContext ctx) {
-                        return alert;
-                      });
-                },
-                child: const Text("Montrer une alerte"))
+                onPressed: (()  => showMyDialog(dialog: createAlert())),
+                child: const Text("Montrer une alerte")
+             ),
+            ElevatedButton(onPressed: () {
+            showMyDialog(dialog: createSimple());
+            }, child: Text("Montrer simplement")),
+            ElevatedButton(onPressed: () {
+              final nextPage = Next(color: appBarColor);
+              Navigator.of(context).push(
+                MaterialPageRoute(builder: (BuildContext ctx) {
+                  return nextPage;
+              }));
+            } , child: Text("Passer à la page suivante"))
           ],
         ),
       ),
@@ -114,6 +99,61 @@ Color appBarColor = Colors.lightBlueAccent;
         behavior: SnackBarBehavior.floating,
         content: content);
     return snack;
+  }
 
+  SimpleDialog createSimple() {
+    final simple = SimpleDialog(
+    title: Text("Je suis un dialogue"),
+      children: [
+        Icon(Icons.group, color: appBarColor, size: 34,),
+        Text("Je comme une colonne"),
+        Divider(),
+        Text("Mais je suis dans un pop up"),
+        option()
+      ],
+      elevation: 15,
+    );
+    return simple;
+  }
+  SimpleDialogOption option() {
+    return SimpleDialogOption(
+      onPressed: () {
+        Navigator.of(context).pop();
+      },
+      child: Text("Ok"),
+    );
+  }
+
+
+  AlertDialog createAlert() {
+    return  AlertDialog(
+      title: const Text("Ma première alerte"),
+      content: const Text("J'ai crée ma première alerte"),
+      actions: [
+        TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            child: const Text("Ok")),
+        TextButton(onPressed: () {
+          Navigator.of(context).pop();
+          setState(() {
+            appBarColor = (appBarColor == Colors.lightBlueAccent)
+                ? Colors.lightGreenAccent
+                : Colors.lightBlueAccent;
+          });
+        },
+            child: Text("Changer le AppBar")),
+      ],
+    );
+  }
+
+ Future <void> showMyDialog({required Widget dialog }) async {
+    await showDialog(
+        barrierDismissible: true,
+        context: context,
+        builder: (BuildContext ctx) {
+          return dialog;
+        });
   }
 }
